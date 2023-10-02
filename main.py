@@ -10,7 +10,6 @@ def to_hhmm(x):
 
 src = json.loads(open(sys.argv[1], 'r').read())
 standings = src['objects']
-print(*standings, sep='\n')
 table = [[] for i in range(len(standings) + 1)]
 
 last = 'A'
@@ -24,14 +23,17 @@ while chr(c) != last:
 for i in range(1, len(table)):
     table[i] = [''] * len(table[0])
 
+processed = set()
 for position in standings:
     place = position['place']
+    while place in processed:
+        place += 1
+    processed.add(place)
     table[place][0] = position['more_fields']['name']
     table[place][1] = 0
     table[place][2] = position['more_fields']['penalty']
     for prob, res in position['problems'].items():
         index = ord(prob) - ord('A') + 3
-        print(place, prob, index)
         f = res['result']
         if f[0] == '+':
             table[place][1] += 1
