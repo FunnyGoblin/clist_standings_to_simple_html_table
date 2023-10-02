@@ -1,3 +1,4 @@
+import html
 import sys
 import json
 
@@ -29,7 +30,7 @@ for position in standings:
     while place in processed:
         place += 1
     processed.add(place)
-    table[place][0] = position['more_fields']['name']
+    table[place][0] = html.escape(position['more_fields']['name'])
     table[place][1] = 0
     table[place][2] = position['more_fields']['penalty']
     for prob, res in position['problems'].items():
@@ -37,7 +38,9 @@ for position in standings:
         f = res['result']
         if f[0] == '+':
             table[place][1] += 1
-        t = res['time']
+        t = str(res['time'])
+        if ':' not in t:
+            t += ':00'
         table[place][index] = f'{f} <small>{t}</small>'
 
 out = open(sys.argv[2], 'w')
@@ -50,6 +53,6 @@ for line in table:
         tag = 'th'
         head = False
     for elem in line:
-        out.write(f'\t\t<{tag}>{elem}<\\{tag}>\n')
-    out.write('\t<\\tr>\n')
-out.write('<\\table>')
+        out.write(f'\t\t<{tag}>{elem}</{tag}>\n')
+    out.write('\t</tr>\n')
+out.write('</table>')
